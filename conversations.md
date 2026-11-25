@@ -1,6 +1,6 @@
-# Imaginary Conversation: Building a Food Delivery Chatbot
+# Conversation: Building a Food Delivery Chatbot
 
-This is a fictional example transcript for planning and testing the food delivery chatbot. It illustrates zero-shot, one-shot, few-shot, and reasoning-summary prompts across project setup, backend tools, automated testing, manual QA, and the frontend. The sample restaurant and all order information below are demo data.
+This is a fictional example transcript for planning and testing the food delivery application. It illustrates zero-shot, one-shot, few-shot, and reasoning-summary prompts across Spring Boot setup, a MySQL/JPA marketplace, AOP, automated testing, manual QA, and the frontend. The sample restaurant, orders, payments, and delivery information are demo data.
 
 ## Prompt styles used
 
@@ -14,15 +14,15 @@ This is a fictional example transcript for planning and testing the food deliver
 ## 1. Bootstrap and architecture — zero-shot
 
 **User:**  
-Create a Spring Boot food delivery support chatbot. Use Spring AI with the OpenRouter OpenAI-compatible API, Spring Boot DevTools, a controller, service, model, and tools package, and one HTML file with internal CSS and JavaScript. Do not add JPA or a database. Keep API credentials in a local `.env` file and make the assistant answer only questions about the restaurant.
+Create a simple Spring Boot food delivery marketplace. Use Spring Data JPA with MySQL in Docker, Spring Boot DevTools, controller, service, model, repository, common, and tools packages, and one HTML file with internal CSS and JavaScript. Include guest checkout, simulated payment and delivery, and a constrained Spring AI assistant. Keep API credentials in a local `.env` file.
 
 **Assistant:**  
-I’ll structure the application into `controller`, `service`, `model`, and `tools` packages, configure Spring AI to call OpenRouter, and serve a single static HTML page. I’ll use in-memory demo menu, delivery, and order data; no database or live order integration will be implied. The local `.env` will be ignored by Git, with a safe example file for setup.
+I’ll structure the app into the requested packages, persist menu items and orders with JPA, run MySQL using Docker Compose, and serve a single marketplace page. I’ll add catalog, checkout, simulated payment, delivery, and chat services. AOP will log service timing without logging customer data. The local `.env` stays ignored by Git.
 
 ## 2. Backend domain tools — one-shot
 
 **User:**  
-Add a read-only menu search tool. Use this example to shape the result:
+Add a read-only menu search tool backed by the catalog service and database. Use this example to shape the result:
 
 ```text
 Input: "burger"
@@ -32,13 +32,13 @@ Result: Classic Burger — $12.50
 Keep the tool limited to demo restaurant data.
 
 **Assistant:**  
-I’ll add a Spring AI menu-search tool that matches an item name or category and returns typed menu data. It will only search the local demo catalog; it won’t claim real-time availability or connect to an ordering system.
+I’ll add a Spring AI menu-search tool that queries persisted demo products and returns typed menu data. It won’t claim real-time availability or connect to an external ordering system.
 
 **User:**  
-Add delivery policy and sample order lookup tools too. Make it clear that order results are not live.
+Add delivery policy and order tracking tools too. Make it clear that payments and delivery are simulated.
 
 **Assistant:**  
-I’ll expose delivery hours, service areas, fee, and minimum order through a read-only policy tool. The order lookup will recognize only sample IDs such as `DEMO-1001` and label every result as demo data.
+I’ll expose delivery hours, service areas, fee, and minimum order through a read-only policy tool. The order lookup will use the generated checkout tracking code and return only status and ETA, clearly labeled as demo data.
 
 ## 3. Organization-only responses — few-shot
 
@@ -87,14 +87,18 @@ Create a manual test checklist for a tester using the browser. Include normal fl
 
 | Test | Steps | Expected result |
 | --- | --- | --- |
-| Initial page | Open `http://localhost:8080`. | The single-page chat UI loads and identifies itself as demo data. |
+| Initial page | Open `http://localhost:8080`. | The single-page marketplace loads and identifies itself as demo data. |
 | Menu question | Ask “What’s on the menu?” | The assistant answers from the demo menu and does not invent items. |
 | Delivery question | Ask “Where do you deliver?” | The assistant uses the demo delivery policy. |
-| Sample order | Ask for `DEMO-1001`. | The answer identifies the result as demo data, not a live order. |
-| Unknown order | Ask for an unknown order ID. | The assistant says there is no matching demo order and no live order integration. |
+| Add to basket | Add menu items and adjust quantities. | Basket counts and subtotal update in the browser. |
+| Guest checkout | Submit name, delivery address, and menu items totaling at least $15. | An order is stored, a tracking code is returned, and the $3 fee is included. |
+| Simulated payment | Choose simulated card payment. | Checkout says simulated; no card details are requested and no payment is processed. |
+| Track order | Submit the tracking code from checkout. | The stored order status and demo estimate are shown. |
+| Unknown order | Submit an unknown tracking code. | The API returns not found without exposing customer details. |
 | Out-of-scope question | Ask a general-knowledge question. | The assistant politely redirects to restaurant questions. |
-| Blank input | Submit whitespace only. | The browser prevents an empty message; the API also validates requests. |
-| Length limit | Try to submit more than 1000 characters. | The UI limits input and the API rejects oversized requests. |
+| Below-minimum order | Submit a basket below $15. | The storefront blocks checkout or the API returns a validation error. |
+| Invalid quantity | Send an order with quantity 0 or greater than 10. | The API rejects the request. |
+| Blank chat input | Submit whitespace only. | The browser prevents an empty message; the API also validates requests. |
 | Provider unavailable | Stop the backend or make the model provider unavailable, then send a message. | The UI shows a generic retry message; the backend logs the provider failure. |
 
 ## 6. Frontend behavior — one-shot
@@ -108,10 +112,10 @@ POST /api/chat body: {"message":"Where do you deliver?"}
 Successful response: {"reply":"..."}
 ```
 
-Build the chat page as one HTML file. Keep CSS and JavaScript inside it, display messages as text rather than HTML, and show a useful generic message if the API is unavailable.
+Build a compatible marketplace page in one HTML file. Include product browsing, a basket, guest checkout, tracking, and the chat interaction above. Keep CSS and JavaScript inside the file, display API text as text rather than HTML, and show useful errors.
 
 **Assistant:**  
-I’ll make the page post JSON to `/api/chat`, display the `reply` field, and render all messages with text content so user or model text is not interpreted as markup. The page will keep its CSS and JavaScript inline and show a retry message when the request fails.
+I’ll load menu items from `/api/menu`, post checkout requests to `/api/orders`, and use `/api/chat` for the assistant. The page will keep CSS and JavaScript inline, render remote and model text safely as text, and show a tracking code after successful demo checkout.
 
 ## 7. Configuration and release check — few-shot
 
@@ -123,16 +127,17 @@ Correct API root: https://openrouter.ai/api
 Incorrect API root: https://openrouter.ai/api/v1
 ```
 
-The application appends `/v1/chat/completions`. Explain the setup without printing or requesting my API key.
+The application appends `/v1/chat/completions`. The database runs through Compose with local development credentials. Explain setup without printing or requesting my API key.
 
 **Assistant:**  
-Set `OPENROUTER_BASE_URL=https://openrouter.ai/api` in the local `.env`; do not include `/v1`, because the configured completion path already adds it. Keep the key in `.env`, which is ignored by Git, and use `.env.example` only as a placeholder template. For a free-key setup, choose a free model available to the account, such as OpenRouter’s `openrouter/free` router.
+Set `OPENROUTER_BASE_URL=https://openrouter.ai/api` in the local `.env`; do not include `/v1`, because the configured completion path already adds it. Start MySQL with `docker compose up -d mysql`, then run Spring Boot. Keep the key in `.env`, which is ignored by Git, and use `.env.example` only as a placeholder template. For a free-key setup, choose a free model available to the account, such as OpenRouter’s `openrouter/free` router.
 
 ## Takeaways
 
 - Give the assistant explicit scope, data sources, and limits.
 - Use examples when response behavior must be consistent.
-- Keep tool behavior read-only unless real authenticated operations are deliberately added.
-- Test validation and demo-data boundaries without depending on an external model.
+- Keep chat tools read-only; place orders through the validated storefront API.
+- Calculate prices on the server and do not process real payments in the demo.
+- Test persistence and validation with an in-memory database, without depending on OpenRouter.
 - Describe test cases as expected behavior unless they have actually been executed.
 - Ask for concise rationale instead of requesting private chain-of-thought.

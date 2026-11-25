@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-food_delivery}
+      MYSQL_USER: ${DB_USER:-food_delivery}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-food_delivery_dev}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-food_delivery_root_dev}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-food_delivery_root_dev}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql_data:

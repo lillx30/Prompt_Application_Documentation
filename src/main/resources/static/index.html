@@ -3,277 +3,460 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f5ef">
-  <title>Demo Food Delivery | Support</title>
+  <meta name="theme-color" content="#f6f7f2">
+  <title>Demo Food Delivery | Marketplace</title>
   <style>
     :root {
       color-scheme: light;
-      --ink: #20261f;
-      --muted: #6d756e;
-      --paper: #f7f5ef;
-      --panel: #fffefa;
-      --green: #245c43;
-      --green-dark: #194733;
-      --line: #e7e5dc;
-      --user: #e8f1e9;
+      --ink: #202820;
+      --muted: #737b72;
+      --paper: #f6f7f2;
+      --card: #fff;
+      --green: #2f6848;
+      --green-dark: #224e35;
+      --line: #e5e9e1;
+      --accent: #f2c56e;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--ink); }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
 
-    body {
-      min-height: 100vh;
-      margin: 0;
-      padding: 28px 16px;
-      display: grid;
-      place-items: center;
-      background:
-        radial-gradient(ellipse at 12% 10%, #e4eddf 0, transparent 34rem),
-        var(--paper);
-      color: var(--ink);
-    }
-
-    .app {
-      width: min(100%, 760px);
-      height: min(820px, calc(100vh - 56px));
-      min-height: 520px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border: 1px solid var(--line);
-      border-radius: 24px;
-      background: var(--panel);
-      box-shadow: 0 24px 70px #26332618;
-    }
-
-    header {
-      padding: 24px 28px;
+    .topbar {
+      position: sticky;
+      z-index: 5;
+      top: 0;
       display: flex;
       align-items: center;
-      gap: 14px;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px max(5vw, 20px);
       border-bottom: 1px solid var(--line);
+      background: #ffffffed;
+      backdrop-filter: blur(12px);
     }
 
-    .brand-mark {
-      width: 46px;
-      height: 46px;
+    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
+    .brand-mark { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 13px; background: #e6efe6; font-size: 22px; }
+    .brand-name { font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
+    nav { display: flex; gap: 22px; }
+    nav a { color: #515a50; font-size: 13px; font-weight: 650; text-decoration: none; }
+    nav a:hover { color: var(--green); }
+    .demo-pill { padding: 7px 10px; border: 1px solid #e8d8ae; border-radius: 999px; background: #fcf5e1; color: #76591a; font-size: 10px; font-weight: 800; letter-spacing: .07em; }
+
+    .hero {
       display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-      border-radius: 15px;
-      background: #e8f1e9;
-      font-size: 24px;
-    }
-
-    .brand-copy { flex: 1; }
-    h1 { margin: 0; font-size: 18px; letter-spacing: -0.02em; }
-    .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
-
-    .demo-badge {
-      padding: 7px 10px;
-      border: 1px solid #e8d9ae;
-      border-radius: 999px;
-      background: #fcf5e1;
-      color: #76591a;
-      font-size: 11px;
-      font-weight: 750;
-      letter-spacing: 0.06em;
-      white-space: nowrap;
-    }
-
-    .chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      scroll-behavior: smooth;
-    }
-
-    .message {
-      max-width: min(82%, 520px);
-      padding: 13px 16px;
-      border-radius: 17px;
-      font-size: 14px;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-
-    .message.assistant {
-      align-self: flex-start;
-      border: 1px solid var(--line);
-      border-bottom-left-radius: 5px;
-      background: #fff;
-    }
-
-    .message.user {
-      align-self: flex-end;
-      border-bottom-right-radius: 5px;
-      background: var(--user);
-    }
-
-    .message.pending { color: var(--muted); font-style: italic; }
-
-    .suggestions {
-      padding: 0 28px 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .suggestion {
-      padding: 8px 12px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: transparent;
-      color: var(--green);
-      cursor: pointer;
-      font: inherit;
-      font-size: 12px;
-      transition: background 150ms ease, border-color 150ms ease;
-    }
-
-    .suggestion:hover { border-color: #b7c8b9; background: #f2f7f1; }
-
-    form {
-      padding: 18px 22px 14px;
-      border-top: 1px solid var(--line);
-      background: #fff;
-    }
-
-    .composer {
-      display: flex;
-      align-items: flex-end;
-      gap: 12px;
-      padding: 8px 8px 8px 15px;
-      border: 1px solid #dcdfd8;
-      border-radius: 17px;
-      background: #fff;
-      transition: border-color 150ms ease, box-shadow 150ms ease;
-    }
-
-    .composer:focus-within {
-      border-color: #8eaa96;
-      box-shadow: 0 0 0 3px #245c4312;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 42px;
-      max-height: 120px;
-      padding: 10px 0;
-      resize: vertical;
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: var(--ink);
-      font: inherit;
-      font-size: 14px;
-    }
-
-    textarea::placeholder { color: #9aa098; }
-
-    .send {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-      border: 0;
-      border-radius: 12px;
-      background: var(--green);
+      min-height: 270px;
+      align-items: center;
+      padding: 42px max(7vw, 24px);
+      background: linear-gradient(105deg, #173b2c 4%, #2f6848 62%, #82a478 100%);
       color: #fff;
-      cursor: pointer;
-      transition: background 150ms ease, opacity 150ms ease;
     }
 
-    .send:hover:not(:disabled) { background: var(--green-dark); }
-    .send:disabled { cursor: wait; opacity: 0.55; }
-    .send svg { width: 19px; height: 19px; }
+    .hero-content { max-width: 760px; }
+    .eyebrow { margin: 0 0 12px; color: #f3d28d; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { max-width: 650px; margin: 0; font-size: clamp(32px, 5vw, 54px); line-height: 1.04; letter-spacing: -.055em; }
+    .hero p:last-child { max-width: 530px; margin: 15px 0 0; color: #e0ebe0; font-size: 15px; line-height: 1.65; }
 
-    .footnote {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 11px;
-      text-align: center;
+    .notice { margin: 22px auto 0; padding: 11px 15px; width: min(1120px, calc(100% - 32px)); border: 1px solid #ead8a9; border-radius: 12px; background: #fff9e9; color: #675321; font-size: 12px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 24px; width: min(1120px, calc(100% - 32px)); margin: 30px auto 60px; align-items: start; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin: 0 0 16px; }
+    h2 { margin: 0; font-size: 23px; letter-spacing: -.035em; }
+    .section-heading p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 17px; }
+    .filter { padding: 8px 13px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: #586056; font-size: 12px; }
+    .filter.active, .filter:hover { border-color: var(--green); background: var(--green); color: #fff; }
+    .menu-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+    .menu-card { overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--card); transition: transform 150ms ease, box-shadow 150ms ease; }
+    .menu-card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px #23352212; }
+    .menu-card img { display: block; width: 100%; height: 155px; object-fit: cover; background: #e6e9e2; }
+    .menu-card-body { padding: 13px; }
+    .menu-card-top { display: flex; align-items: start; justify-content: space-between; gap: 8px; }
+    .menu-card h3 { margin: 0; font-size: 14px; letter-spacing: -.02em; }
+    .price { color: var(--green-dark); font-size: 14px; font-weight: 800; white-space: nowrap; }
+    .category { margin: 4px 0 0; color: #849084; font-size: 10px; font-weight: 750; text-transform: uppercase; letter-spacing: .08em; }
+    .description { min-height: 36px; margin: 9px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .add-button, .primary-button { width: 100%; padding: 10px 12px; border: 0; border-radius: 10px; background: var(--green); color: #fff; font-size: 12px; font-weight: 750; }
+    .add-button:hover, .primary-button:hover:not(:disabled) { background: var(--green-dark); }
+    .primary-button:disabled { cursor: not-allowed; opacity: .5; }
+
+    .side-column { display: grid; gap: 15px; position: sticky; top: 82px; }
+    .panel { padding: 17px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+    .panel h2 { font-size: 17px; }
+    .cart-empty { margin: 13px 0; color: var(--muted); font-size: 12px; }
+    .cart-items { display: grid; gap: 10px; margin: 14px 0; }
+    .cart-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+    .cart-name { font-size: 12px; font-weight: 700; }
+    .cart-row-price { margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .quantity { display: flex; align-items: center; gap: 8px; }
+    .quantity button { width: 25px; height: 25px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--green-dark); font-weight: 750; }
+    .quantity span { min-width: 12px; text-align: center; font-size: 12px; }
+    .totals { display: grid; gap: 8px; margin: 14px 0; padding-top: 12px; border-top: 1px solid var(--line); }
+    .total-row { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; }
+    .total-row.grand { color: var(--ink); font-size: 14px; font-weight: 800; }
+    .form-fields { display: grid; gap: 9px; margin: 14px 0 11px; }
+    label { display: grid; gap: 5px; color: #596258; font-size: 11px; font-weight: 700; }
+    input, select, textarea { width: 100%; padding: 10px 11px; border: 1px solid #dfe4dc; border-radius: 9px; outline: none; background: #fff; color: var(--ink); font-size: 12px; }
+    input:focus, select:focus, textarea:focus { border-color: #8eaa96; box-shadow: 0 0 0 3px #245c4312; }
+    .form-message { min-height: 16px; margin: 8px 0 0; color: #a13d31; font-size: 11px; line-height: 1.45; }
+    .form-message.success { color: var(--green-dark); }
+    .small-note { margin: 10px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .track-form { display: flex; gap: 7px; margin-top: 12px; }
+    .track-form input { min-width: 0; }
+    .track-form button { padding: 0 12px; border: 0; border-radius: 9px; background: #e7efe7; color: var(--green-dark); font-size: 11px; font-weight: 750; }
+    .chat-panel { grid-column: 1 / -1; }
+    .chat-window { display: grid; gap: 8px; max-height: 220px; overflow-y: auto; margin: 12px 0; }
+    .chat-message { max-width: 85%; padding: 9px 12px; border-radius: 12px; background: #f1f4ef; font-size: 12px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .chat-message.user { justify-self: end; background: #e4efe5; }
+    .chat-form { display: flex; gap: 8px; }
+    .chat-form input { flex: 1; }
+    .chat-form button { padding: 0 16px; border: 0; border-radius: 9px; background: var(--green); color: #fff; font-size: 12px; font-weight: 750; }
+    .loading, .empty-state { padding: 28px 12px; color: var(--muted); text-align: center; font-size: 13px; }
+    footer { padding: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; text-align: center; }
+    footer a { color: var(--green); }
+
+    @media (max-width: 850px) {
+      .layout { grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; }
+      .menu-grid { gap: 10px; }
+      .menu-card img { height: 130px; }
     }
-
-    @media (max-width: 560px) {
-      body { padding: 0; }
-      .app {
-        width: 100%;
-        height: 100vh;
-        min-height: 0;
-        border: 0;
-        border-radius: 0;
-      }
-      header { padding: 18px 16px; }
-      .demo-badge { padding: 6px 8px; font-size: 10px; }
-      .chat { padding: 22px 16px; }
-      .message { max-width: 90%; }
-      .suggestions { padding: 0 16px 14px; }
-      form { padding: 14px 14px 12px; }
+    @media (max-width: 680px) {
+      .topbar { padding: 12px 16px; }
+      nav { gap: 13px; }
+      nav a { font-size: 11px; }
+      .demo-pill { display: none; }
+      .hero { min-height: 230px; padding: 34px 22px; }
+      .layout { grid-template-columns: 1fr; width: min(100% - 24px, 520px); margin-top: 20px; }
+      .side-column { position: static; }
+      .chat-panel { grid-column: auto; }
+    }
+    @media (max-width: 420px) {
+      nav { gap: 9px; }
+      nav a { font-size: 10px; }
+      .brand-name { font-size: 14px; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .menu-card img { height: 180px; }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <header>
-      <div class="brand-mark" aria-hidden="true">🥗</div>
-      <div class="brand-copy">
-        <h1>Demo Food Delivery</h1>
-        <p class="subtitle">Your friendly menu and delivery assistant</p>
-      </div>
-      <span class="demo-badge">DEMO DATA</span>
-    </header>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Demo Food Delivery home">
+      <span class="brand-mark" aria-hidden="true">🥗</span>
+      <span class="brand-name">Demo Food Delivery</span>
+    </a>
+    <nav aria-label="Main navigation">
+      <a href="#marketplace">Menu</a>
+      <a href="#checkout">Cart &amp; checkout</a>
+      <a href="#tracking">Track order</a>
+      <a href="#assistant">Ask us</a>
+    </nav>
+    <span class="demo-pill">DEMO MARKETPLACE</span>
+  </header>
 
-    <section class="chat" id="chat" aria-label="Conversation" aria-live="polite">
-      <div class="message assistant">Hi! I can help with our demo menu, delivery areas, hours, fees, and sample order statuses. What would you like to know?</div>
+  <section class="hero">
+    <div class="hero-content">
+      <p class="eyebrow">Good food, delivered simply</p>
+      <h1>Your neighborhood favorites, made fresh.</h1>
+      <p>Browse the demo menu, build a basket, and try a simulated checkout. No real payment or delivery service is connected.</p>
+    </div>
+  </section>
+
+  <div class="notice"><strong>Demo store:</strong> Menu items, images, orders, payments, and delivery estimates are for demonstration only.</div>
+
+  <main class="layout">
+    <section id="marketplace" aria-labelledby="menu-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="menu-title">The menu</h2>
+          <p>Fresh picks from our sample kitchen</p>
+        </div>
+      </div>
+      <div class="filters" id="filters" aria-label="Filter menu by category"></div>
+      <div class="menu-grid" id="menu-grid" aria-live="polite">
+        <div class="loading">Loading the demo menu…</div>
+      </div>
     </section>
 
-    <div class="suggestions" aria-label="Suggested questions">
-      <button class="suggestion" type="button">What's on the menu?</button>
-      <button class="suggestion" type="button">Where do you deliver?</button>
-      <button class="suggestion" type="button">Check DEMO-1001</button>
-    </div>
+    <aside class="side-column">
+      <section class="panel" id="checkout" aria-labelledby="cart-title">
+        <h2 id="cart-title">Your basket <span id="cart-count">(0)</span></h2>
+        <div id="cart-items"></div>
+        <div class="totals">
+          <div class="total-row"><span>Food subtotal</span><strong id="subtotal">$0.00</strong></div>
+          <div class="total-row"><span>Delivery</span><strong id="delivery-fee">$3.00</strong></div>
+          <div class="total-row grand"><span>Total</span><strong id="total">$3.00</strong></div>
+        </div>
+        <form id="checkout-form">
+          <div class="form-fields">
+            <label>
+              Name
+              <input name="customerName" maxlength="100" required autocomplete="name" placeholder="Your name">
+            </label>
+            <label>
+              Delivery address
+              <input name="deliveryAddress" maxlength="300" required autocomplete="street-address" placeholder="Street and area">
+            </label>
+            <label>
+              Payment
+              <select name="paymentMethod">
+                <option value="CASH_ON_DELIVERY">Cash on delivery</option>
+                <option value="SIMULATED_CARD">Simulated card payment (no charge)</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary-button" id="checkout-button" type="submit">Place demo order</button>
+          <p class="form-message" id="checkout-message" role="status"></p>
+          <p class="small-note">Minimum food subtotal $15.00. Card selection is a simulation only; never enter card details.</p>
+        </form>
+      </section>
 
-    <form id="chat-form">
-      <div class="composer">
-        <textarea id="message" name="message" rows="1" maxlength="1000" required
-                  aria-label="Your message" placeholder="Ask about the demo restaurant..."></textarea>
-        <button class="send" id="send" type="submit" aria-label="Send message">
-          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M4 12 20 4l-5 16-3-7-8-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-            <path d="m12 13 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-        </button>
+      <section class="panel" id="tracking" aria-labelledby="tracking-title">
+        <h2 id="tracking-title">Track an order</h2>
+        <p class="small-note">Enter the tracking code shown after checkout.</p>
+        <form class="track-form" id="tracking-form">
+          <input name="orderCode" required aria-label="Order tracking code" placeholder="FD-XXXXXXXXXXXX">
+          <button type="submit">Track</button>
+        </form>
+        <p class="form-message" id="tracking-message" role="status"></p>
+      </section>
+    </aside>
+
+    <section class="panel chat-panel" id="assistant" aria-labelledby="assistant-title">
+      <h2 id="assistant-title">Need a hand?</h2>
+      <p class="small-note">Ask about the demo menu, delivery policy, or an order tracking code.</p>
+      <div class="chat-window" id="chat-window" aria-live="polite">
+        <div class="chat-message">Hi! I can help with menu and delivery questions. All information is demo-only.</div>
       </div>
-      <p class="footnote">Demo answers only. No live orders, payments, or personal account data are connected.</p>
-    </form>
+      <form class="chat-form" id="chat-form">
+        <input name="message" maxlength="1000" required aria-label="Ask the assistant" placeholder="Ask us something…">
+        <button type="submit">Send</button>
+      </form>
+    </section>
   </main>
 
-  <script>
-    const chat = document.getElementById("chat");
-    const form = document.getElementById("chat-form");
-    const input = document.getElementById("message");
-    const sendButton = document.getElementById("send");
+  <footer>
+    Demo checkout and tracking only. Food photos are served from <a href="https://unsplash.com" target="_blank" rel="noreferrer">Unsplash</a>.
+  </footer>
 
-    function addMessage(text, role, extraClass = "") {
-      const message = document.createElement("div");
-      message.className = `message ${role} ${extraClass}`.trim();
-      message.textContent = text;
-      chat.append(message);
-      chat.scrollTop = chat.scrollHeight;
-      return message;
+  <script>
+    const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
+    const menuGrid = document.getElementById("menu-grid");
+    const filters = document.getElementById("filters");
+    const cartItemsNode = document.getElementById("cart-items");
+    const checkoutButton = document.getElementById("checkout-button");
+    let menu = [];
+    let activeCategory = "All";
+    let cart = new Map();
+
+    try {
+      const savedCart = JSON.parse(localStorage.getItem("demo-food-cart") || "[]");
+      cart = new Map(savedCart.filter(([id, quantity]) =>
+        Number.isSafeInteger(id) && Number.isInteger(quantity) && quantity > 0 && quantity <= 10));
+    } catch {
+      localStorage.removeItem("demo-food-cart");
     }
 
-    async function sendMessage(text) {
-      addMessage(text, "user");
+    function addText(parent, tag, className, text) {
+      const element = document.createElement(tag);
+      if (className) element.className = className;
+      element.textContent = text;
+      parent.append(element);
+      return element;
+    }
+
+    async function readJson(response) {
+      const body = await response.json();
+      if (!response.ok) throw new Error(body.message || `Request failed (${response.status})`);
+      return body;
+    }
+
+    async function loadMenu() {
+      try {
+        const response = await fetch("/api/menu");
+        menu = await readJson(response);
+        renderFilters();
+        renderMenu();
+        renderCart();
+      } catch {
+        menuGrid.replaceChildren();
+        addText(menuGrid, "p", "empty-state", "We couldn't load the menu. Check that the app and database are running, then refresh.");
+      }
+    }
+
+    function renderFilters() {
+      filters.replaceChildren();
+      const categories = ["All", ...new Set(menu.map((item) => item.category))];
+      categories.forEach((category) => {
+        const button = addText(filters, "button", `filter${category === activeCategory ? " active" : ""}`, category);
+        button.type = "button";
+        button.addEventListener("click", () => {
+          activeCategory = category;
+          renderFilters();
+          renderMenu();
+        });
+      });
+    }
+
+    function renderMenu() {
+      menuGrid.replaceChildren();
+      const visible = activeCategory === "All"
+        ? menu
+        : menu.filter((item) => item.category === activeCategory);
+      if (!visible.length) {
+        addText(menuGrid, "p", "empty-state", "No menu items in this category.");
+        return;
+      }
+
+      visible.forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "menu-card";
+        const image = document.createElement("img");
+        image.src = item.imageUrl;
+        image.alt = item.name;
+        image.loading = "lazy";
+        image.referrerPolicy = "no-referrer";
+        card.append(image);
+
+        const body = document.createElement("div");
+        body.className = "menu-card-body";
+        const top = document.createElement("div");
+        top.className = "menu-card-top";
+        addText(top, "h3", "", item.name);
+        addText(top, "span", "price", money.format(item.price));
+        body.append(top);
+        addText(body, "p", "category", item.category);
+        addText(body, "p", "description", item.description);
+        const quantity = cart.get(item.id) || 0;
+        const add = addText(body, "button", "add-button", quantity >= 10 ? "Maximum quantity reached" : "Add to basket");
+        add.type = "button";
+        add.disabled = quantity >= 10;
+        add.addEventListener("click", () => changeQuantity(item.id, 1));
+        card.append(body);
+        menuGrid.append(card);
+      });
+    }
+
+    function changeQuantity(id, amount) {
+      const next = (cart.get(id) || 0) + amount;
+      if (next > 10) return;
+      if (next <= 0) cart.delete(id);
+      else cart.set(id, next);
+      localStorage.setItem("demo-food-cart", JSON.stringify([...cart]));
+      renderCart();
+      renderMenu();
+    }
+
+    function renderCart() {
+      cartItemsNode.replaceChildren();
+      const entries = [...cart.entries()]
+        .map(([id, quantity]) => ({ item: menu.find((entry) => entry.id === id), quantity }))
+        .filter((entry) => entry.item);
+      const count = entries.reduce((sum, entry) => sum + entry.quantity, 0);
+      const subtotal = entries.reduce((sum, entry) => sum + entry.item.price * entry.quantity, 0);
+      const fee = 3;
+      document.getElementById("cart-count").textContent = `(${count})`;
+      document.getElementById("subtotal").textContent = money.format(subtotal);
+      document.getElementById("delivery-fee").textContent = money.format(fee);
+      document.getElementById("total").textContent = money.format(subtotal + fee);
+      checkoutButton.disabled = !entries.length || subtotal < 15;
+
+      if (!entries.length) {
+        addText(cartItemsNode, "p", "cart-empty", "Your basket is empty. Add a menu favorite to get started.");
+        return;
+      }
+
+      const list = document.createElement("div");
+      list.className = "cart-items";
+      entries.forEach(({ item, quantity }) => {
+        const row = document.createElement("div");
+        row.className = "cart-row";
+        const description = document.createElement("div");
+        addText(description, "div", "cart-name", item.name);
+        addText(description, "div", "cart-row-price", money.format(item.price * quantity));
+        row.append(description);
+        const controls = document.createElement("div");
+        controls.className = "quantity";
+        const decrease = addText(controls, "button", "", "−");
+        decrease.type = "button";
+        decrease.setAttribute("aria-label", `Remove one ${item.name}`);
+        decrease.addEventListener("click", () => changeQuantity(item.id, -1));
+        addText(controls, "span", "", String(quantity));
+        const increase = addText(controls, "button", "", "+");
+        increase.type = "button";
+        increase.setAttribute("aria-label", `Add one ${item.name}`);
+        increase.disabled = quantity >= 10;
+        increase.addEventListener("click", () => changeQuantity(item.id, 1));
+        row.append(controls);
+        list.append(row);
+      });
+      cartItemsNode.append(list);
+    }
+
+    document.getElementById("checkout-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const message = document.getElementById("checkout-message");
+      message.className = "form-message";
+      message.textContent = "";
+      checkoutButton.disabled = true;
+      const formData = new FormData(form);
+      const order = {
+        customerName: formData.get("customerName"),
+        deliveryAddress: formData.get("deliveryAddress"),
+        paymentMethod: formData.get("paymentMethod"),
+        items: [...cart.entries()].map(([menuItemId, quantity]) => ({ menuItemId, quantity }))
+      };
+
+      try {
+        const response = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(order)
+        });
+        const placed = await readJson(response);
+        cart.clear();
+        localStorage.removeItem("demo-food-cart");
+        renderCart();
+        renderMenu();
+        message.className = "form-message success";
+        message.textContent = `Demo order ${placed.orderCode} placed. ${placed.status}; estimated ${placed.estimatedDelivery}. Payment: ${placed.paymentStatus}.`;
+        document.querySelector('#tracking-form [name="orderCode"]').value = placed.orderCode;
+      } catch (error) {
+        message.textContent = error.message || "Unable to place the demo order. Please try again.";
+      } finally {
+        renderCart();
+      }
+    });
+
+    document.getElementById("tracking-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const code = new FormData(event.currentTarget).get("orderCode").trim();
+      const message = document.getElementById("tracking-message");
+      message.className = "form-message";
+      try {
+        const response = await fetch(`/api/orders/${encodeURIComponent(code)}`);
+        const order = await readJson(response);
+        message.className = "form-message success";
+        message.textContent = `Demo order ${order.orderCode}: ${order.status}. Estimated delivery ${order.estimatedDelivery}.`;
+      } catch (error) {
+        message.textContent = error.message || "Unable to find that demo order.";
+      }
+    });
+
+    document.getElementById("chat-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const input = form.elements.message;
+      const text = input.value.trim();
+      if (!text) return;
+      const windowNode = document.getElementById("chat-window");
+      addText(windowNode, "div", "chat-message user", text);
       input.value = "";
-      sendButton.disabled = true;
-      const pending = addMessage("Finding an answer...", "assistant", "pending");
+      const pending = addText(windowNode, "div", "chat-message", "Checking the demo information…");
 
       try {
         const response = await fetch("/api/chat", {
@@ -281,42 +464,15 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: text })
         });
-        if (!response.ok) {
-          throw new Error(`Chat service returned ${response.status}`);
-        }
-        const result = await response.json();
-        pending.remove();
-        addMessage(result.reply, "assistant");
+        const result = await readJson(response);
+        pending.textContent = result.reply;
       } catch {
-        pending.remove();
-        addMessage("Sorry, I couldn't reach the chat service. Please try again.", "assistant");
-      } finally {
-        sendButton.disabled = false;
-        input.focus();
+        pending.textContent = "Sorry, I couldn't reach the chat service. Please try again.";
       }
-    }
-
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      const text = input.value.trim();
-      if (text && !sendButton.disabled) {
-        sendMessage(text);
-      }
+      windowNode.scrollTop = windowNode.scrollHeight;
     });
 
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        form.requestSubmit();
-      }
-    });
-
-    document.querySelectorAll(".suggestion").forEach((button) => {
-      button.addEventListener("click", () => {
-        input.value = button.textContent;
-        form.requestSubmit();
-      });
-    });
+    loadMenu();
   </script>
 </body>
 </html>
