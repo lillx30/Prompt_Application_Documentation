@@ -22,7 +22,7 @@ A small Spring Boot chatbot for a fictional food delivery restaurant. It uses Sp
 
 4. Open [http://localhost:8080](http://localhost:8080).
 
-The default model is OpenRouter's `openrouter/free` router. Set `OPENROUTER_MODEL` in `.env` to another model available to your account if needed. The OpenRouter base URL and model are configurable there as well.
+The default model is OpenRouter's `openrouter/free` router. Set `OPENROUTER_MODEL` in `.env` to another model available to your account if needed. The base URL must be `https://openrouter.ai/api` (without `/v1`), because the application appends `/v1/chat/completions`. The OpenRouter base URL and model are configurable there as well.
 
 ## API
 
